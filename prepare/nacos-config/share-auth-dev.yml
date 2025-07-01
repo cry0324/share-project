@@ -1,0 +1,5 @@
+spring:
+  data:
+    redis:
+      host: 192.168.200.130
+      port: 63791

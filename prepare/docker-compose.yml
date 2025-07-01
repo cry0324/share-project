@@ -1,0 +1,81 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0.29
+    container_name: share_mysql
+    restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+  redis:
+    image: redis:7.0.10
+    container_name: share_redis
+    restart: always
+    ports:
+      - "63791:6379"
+  nacos:
+    image: nacos/nacos-server:v2.1.1
+    container_name: share_nacos2.1.1
+    restart: always
+    environment:
+      - MODE=standalone  # 单机模式
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9849:9849"
+  minio:
+    image: minio/minio
+    container_name: share_minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: root123456
+    ports:
+      - "9000:9000"   # API端口
+      - "9001:9001"   # 控制台端口
+    volumes:
+      - share_minio-data:/data
+      - share_minio-config:/root/.minio
+    command: server /data --console-address ":9001"
+  rabbitmq:
+    image: rabbitmq:3.12.0-management
+    container_name: share_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"   # AMQP协议端口
+      - "15672:15672" # 管理界面端口
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: 123456
+  mongodb:
+    image: mongo:7.0.0
+    container_name: share_mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - /opt/mongo/data/db:/data/db  # 宿主机目录绑定
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+  emqx:
+    image: emqx/emqx:5.7.0
+    container_name: emqx
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "8084:8084"
+      - "8883:8883"
+      - "18083:18083"
+    volumes:
+      - emqx-data:/opt/emqx/data
+      - emqx-log:/opt/emqx/log
+volumes:
+  mysql-data:
+  share_minio-data:
+  share_minio-config:
+  emqx-data:
+  emqx-log:
